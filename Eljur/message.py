@@ -49,5 +49,5 @@ def send_message(answer, sender_id):
             "cancel": "Отмена"}
 
     answer["session"].post(
-            url=f"https://{answer['subdomain']}.eljur.ru/journal-messages-send-action/",
-            data=data)
+        url=f"https://{answer['subdomain']}.eljur.ru/journal-messages-send-action/",
+        data=data)

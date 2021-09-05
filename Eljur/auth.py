@@ -1,50 +1,103 @@
 from bs4 import BeautifulSoup
-from requests import Session
+from requests import Session, post
 import json
-import re
+from Eljur.errors import _checkStatus, _checkSubdomain, _findData
 
 
-def _findData(soup):
-    for tag in soup.find_all("script"):
-        contents = tag.contents
-        for content in contents:
-            if "sentryData" in content:
-                return content
+class Authorization:
 
+    def register(self, code):
+        """
+        Регистрация пользователя eljur.ru.
 
-def auth(subdomain, data):
-    """
-    Подключение к пользователю eljur.ru.
+        :param code: Единоразовый код, который можно получить в школе.
 
-    :param subdomain: поддомен eljur.ru
-    :param data: дата, состоящая из {"username": "ваш логин",
-                                     "password": "ваш пароль"}
+        :return: code/Не завершено
+        """
+        return code
 
-    :return: словарь с ошибкой или с положительным ответом:
-             answer // dict
-             сессии // Session
-             поддомен // str
-    """
+    def login(self, subdomain, data):
+        """
+        Подключение к пользователю eljur.ru.
 
-    subdomain = re.search(r"[a-zA-Z]+", subdomain)
-    if not subdomain:
-        return {"error": {"error_code": -1,
-                          "error_msg": "subdomain not found"}}
+        :param subdomain: поддомен eljur.ru
+        :param data: дата, состоящая из {"username": "ваш логин",
+                                         "password": "ваш пароль"}
 
-    session = Session()
-    session.post(url=f"https://{subdomain[0]}.eljur.ru/ajaxauthorize", data=data)
+        :return: словарь с ошибкой или с положительным ответом:
+                 answer // dict
+                 session // Session
+                 subdomain // str
+                 result // bool
+        """
 
-    account = session.get(url=f"https://{subdomain[0]}.eljur.ru/?show=home")
-    soup = BeautifulSoup(account.text, 'lxml')
+        subdomain = _checkSubdomain(subdomain)
+        if "error" in subdomain:
+            return subdomain
 
-    sentryData = _findData(soup)
+        session = Session()
+        url = f"https://{subdomain}.eljur.ru/ajaxauthorize"
+        err = session.post(url=url, data=data)
 
-    if not sentryData:
-        return {"error": {"error_code": -2,
-                          "error_msg": "sentryData not found"}}
+        checkStatus = _checkStatus(err, url)
+        if "error" in checkStatus:
+            return checkStatus
 
-    sentryData = json.loads(sentryData[17:-1])
+        if not err.json()["result"]:
+            return {"error": {"error_code": -103,
+                              "error_msg": err.json()['error'],
+                              "full_error": err.json()}}
 
-    return {"answer": sentryData,
-            "session": session,
-            "subdomain": subdomain[0]}
+        url = f"https://{subdomain}.eljur.ru/?show=home"
+        account = session.get(url=url)
+        checkStatus = _checkStatus(account, url)
+        if "error" in checkStatus:
+            return checkStatus
+
+        soup = BeautifulSoup(account.text, 'lxml')
+
+        sentryData = _findData(soup)
+        if not sentryData:
+            return {"error": {"error_code": -104,
+                              "error_msg": "Данные о пользователе не найдены."}}
+
+        sentryData = json.loads(sentryData[17:-1])
+
+        return {"answer": sentryData,
+                "session": session,
+                "subdomain": subdomain,
+                "result": True}
+
+    def recover(self, subdomain, email):
+        """
+        Восстановление пароля пользователя eljur.ru.
+
+        Внимание! Для использования данной функции требуется привязать почту.
+        В ином случае восстановление происходит через Администратора или другого лица вашей школы.
+
+        :param subdomain: домен вашей школы.
+        :param email: ваша почта, привязанная к аккаунту eljur
+
+        :return: словарь с ошибкой или с положительным ответом:
+                 answer // dict
+                 result // bool
+        """
+
+        subdomain = _checkSubdomain(subdomain)
+        if "error" in subdomain:
+            return subdomain
+
+        url = f"https://{subdomain}.eljur.ru/ajaxrecover"
+        answer = post(url=url,
+                      data={"email": email})
+
+        checkStatus = _checkStatus(answer, url)
+        if "error" in checkStatus:
+            return checkStatus
+
+        if not answer.json()["result"]:
+            return {"error": {"error_code": -105,
+                              "error_msg": answer.json()['error'],
+                              "full_error": answer.json()}}
+        return {"answer": "Сообщение успешно отправлено на почту.",
+                "result": True}

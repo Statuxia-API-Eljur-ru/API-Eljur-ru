@@ -1,44 +1,29 @@
-from Eljur.auth import auth
-from Eljur.message import school_list, send_message
-
-
-def checkList(answer):
-    myList = school_list(answer)
-    print(myList[2])
-    choose = input("Выберите чей список вывести: ")
-
-    if choose not in myList[1]:
-        return
-    print(choose, len(myList[1][choose]["user_list"]))
-    for user in myList[1][choose]["user_list"]:
-        print(f"{user['id']}: {user['firstname']} {user['lastname']}")
-    print("")
-
-
-def sendMessage(answer):
-
-    senderID = input("Введите ID пользователя, которому нужно отправить сообщение: ")
-    send_message(answer, senderID)
+from Eljur.auth import Authorization
+from Eljur.profile import Profile, Settings
 
 
 def run():
+    authorisation = Authorization()
 
     data = {
         "username": input("Username: "),
         "password": input("Password: ")
     }
-    subdomain = "klgd"
+    subdomain = input("Subdomain: ")
 
-    answer = auth(subdomain, data)
+    answer = authorisation.login(subdomain, data)
+    if "session" not in answer:
+        print(answer)
 
-    if "error" in answer:
-        return print(answer)
+    profile = Profile()
+    info = profile.getProfile(answer["subdomain"], answer["session"])
 
-    if not answer["answer"]["user"]["uid"]:
-        return print("Не удалось залогиниться")
+    for key in info:
+        print(key, info[key])
 
-    checkList(answer)
-    sendMessage(answer)
+    settings = Settings()
+    aa = settings.switcher(answer["subdomain"], answer["session"], 0, False)
+    print(aa)
 
 
 if __name__ == "__main__":

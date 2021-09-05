@@ -59,7 +59,7 @@ class Profile:
 
 class Security:
 
-    def change_password(self, session, subdomain, old_password, new_password):
+    def changePassword(self, session, subdomain, old_password, new_password):
         """
         Изменение пароля в личном кабинете пользователя.
 
@@ -106,9 +106,9 @@ class Security:
 
 class Settings:
 
-    def change_sing(self, subdomain, session, text):
+    def changeSing(self, subdomain, session, text):
         """
-        Изменение пароля в личном кабинете пользователя.
+            Изменение подписи в новых сообщениях пользователя.
 
         :param subdomain: поддомен eljur.ru
         :param session: активная сессия пользователя

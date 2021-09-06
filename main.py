@@ -1,5 +1,5 @@
 from Eljur.auth import Authorization
-from Eljur.profile import Profile, Settings
+from Eljur.profile import Security
 
 
 def run():
@@ -14,15 +14,10 @@ def run():
     answer = authorisation.login(subdomain, data)
     if "session" not in answer:
         print(answer)
+        return
 
-    profile = Profile()
-    info = profile.getProfile(answer["subdomain"], answer["session"])
-
-    for key in info:
-        print(key, info[key])
-
-    settings = Settings()
-    aa = settings.switcher(answer["subdomain"], answer["session"], 0, False)
+    settings = Security()
+    aa = settings.changePassword(answer["subdomain"], answer["session"], data["password"], input("New Password: "))
     print(aa)
 
 

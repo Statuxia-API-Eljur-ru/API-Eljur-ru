@@ -1,5 +1,4 @@
 import re
-from requests import Session
 
 
 def _findData(soup):
@@ -31,10 +30,10 @@ def _checkSubdomain(subdomain):
         return subdomain[0]
 
 
-def _checkSession(session):
-    if not isinstance(session, Session):
+def _checkInstance(obj, cls):
+    if not isinstance(obj, cls):
         return {"error": {"error_code": -201,
-                          "error_msg": "Вы передали не сессию."}}
+                          "error_msg": f"Экземпляр не пренадлежит к классу. {type(obj)} - {type(cls)}"}}
     else:
         return {"answer": "Ok",
                 "result": True}

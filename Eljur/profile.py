@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
-from Eljur.errors import _checkSession, _checkStatus, _checkSubdomain, _findData
+from requests import Session
+from Eljur.errors import _checkInstance, _checkStatus, _checkSubdomain, _findData
 
 
 class Profile:
@@ -23,9 +24,10 @@ class Profile:
         if "error" in subdomain:
             return subdomain
 
-        checkSession = _checkSession(session)
+        checkSession = _checkInstance(session, Session)
         if "error" in checkSession:
             return checkSession
+        del checkSession
 
         url = f"https://{subdomain}.eljur.ru/journal-user-preferences-action"
         account = session.get(url=url)
@@ -33,6 +35,7 @@ class Profile:
         checkStatus = _checkStatus(account, url)
         if "error" in checkStatus:
             return checkStatus
+        del checkStatus
 
         soup = BeautifulSoup(account.text, 'lxml')
 
@@ -40,6 +43,7 @@ class Profile:
         if not sentryData:
             return {"error": {"error_code": -104,
                               "error_msg": "Данные о пользователе не найдены."}}
+        del sentryData
 
         label = None
         info = {}
@@ -59,7 +63,7 @@ class Profile:
 
 class Security:
 
-    def changePassword(self, session, subdomain, old_password, new_password):
+    def changePassword(self, subdomain, session, old_password, new_password):
         """
         Изменение пароля в личном кабинете пользователя.
 
@@ -75,9 +79,10 @@ class Security:
         if "error" in subdomain:
             return subdomain
 
-        checkSession = _checkSession(session)
+        checkSession = _checkInstance(session, Session)
         if "error" in checkSession:
             return checkSession
+        del checkSession
 
         url = f"https://{subdomain}.eljur.ru/journal-messages-compose-action"
         getCookies = session.get(url=url, data={"_msg": "sent"})
@@ -85,6 +90,7 @@ class Security:
         checkStatus = _checkStatus(getCookies, url)
         if "error" in checkStatus:
             return checkStatus
+        del checkStatus
 
         data = {"csrf": getCookies.cookies.values()[0],
                 "old_password": old_password,
@@ -98,6 +104,7 @@ class Security:
         checkStatus = _checkStatus(answer, url)
         if "error" in checkStatus:
             return checkStatus
+        del checkStatus
 
         if "Ваш пароль успешно изменен!" in answer.text:
             return True
@@ -121,16 +128,17 @@ class Settings:
         if "error" in subdomain:
             return subdomain
 
-        checkSession = _checkSession(session)
+        checkSession = _checkInstance(session, Session)
         if "error" in checkSession:
             return checkSession
+        del checkSession
 
         url = f"https://{subdomain}.eljur.ru/journal-index-rpc-action"
         data = {"method": "setPref",
                 "0": "msgsignature",
                 "1": text}
 
-        changeSing = session.get(url=url, data=data)
+        changeSing = session.post(url=url, data=data)
 
         checkStatus = _checkStatus(changeSing, url)
         if "error" in checkStatus:
@@ -170,14 +178,16 @@ class Settings:
         if "error" in subdomain:
             return subdomain
 
-        checkSession = _checkSession(session)
+        checkSession = _checkInstance(session, Session)
         if "error" in checkSession:
             return checkSession
+        del checkSession
 
-        if not isinstance(choose, int):
-            if not isinstance(choose, str):
-                return {"error": {"error_code": -301,
-                        "error_msg": f"Некорректный тип выбора. {type(choose)}"}}
+        checkInt = _checkInstance(choose, int)
+        if "error" in checkInt:
+            checkStr = _checkInstance(choose, str)
+            if "error" in checkStr:
+                return checkStr
             else:
                 if choose not in strSwitch:
                     return {"error": {"error_code": -302,
@@ -189,9 +199,10 @@ class Settings:
                                   "error_msg": f"Вашего выбора нет в предложенных. {choose}"}}
             data["0"] = strSwitch[choose]
 
-        if not isinstance(switch, bool):
-            return {"error": {"error_code": -301,
-                              "error_msg": f"Некорректный тип переключателя. {type(switch)}"}}
+        checkBool = _checkInstance(switch, bool)
+        if "error" not in checkBool:
+            return checkBool
+        del checkBool, checkStr, checkInt
 
         if switch:
             data["1"] = switchers[data["0"]]["on"]

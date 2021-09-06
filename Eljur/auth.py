@@ -42,11 +42,13 @@ class Authorization:
         checkStatus = _checkStatus(err, url)
         if "error" in checkStatus:
             return checkStatus
+        del checkStatus
 
         if not err.json()["result"]:
             return {"error": {"error_code": -103,
                               "error_msg": err.json()['error'],
                               "full_error": err.json()}}
+        del err
 
         url = f"https://{subdomain}.eljur.ru/?show=home"
         account = session.get(url=url)
@@ -57,13 +59,12 @@ class Authorization:
         soup = BeautifulSoup(account.text, 'lxml')
 
         sentryData = _findData(soup)
+        del soup
         if not sentryData:
             return {"error": {"error_code": -104,
                               "error_msg": "Данные о пользователе не найдены."}}
 
-        sentryData = json.loads(sentryData[17:-1])
-
-        return {"answer": sentryData,
+        return {"answer": json.loads(sentryData[17:-1]),
                 "session": session,
                 "subdomain": subdomain,
                 "result": True}

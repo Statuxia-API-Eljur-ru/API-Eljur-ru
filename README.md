@@ -36,6 +36,6 @@ Portfolio: // Не завершено
 - finalGrades
 
 TODO:
-Доделать модуль Message
-Доделать Portfolio и Timetable
-Сделать example папку с примерами работы API
+- Доделать модуль Message
+- Доделать Portfolio и Timetable
+- Сделать example папку с примерами работы API

@@ -35,6 +35,7 @@ Portfolio: // Не завершено
 - attendance
 - finalGrades
 
+---
 TODO:
 - Доделать модуль Message
 - Доделать Portfolio и Timetable

@@ -10,14 +10,10 @@ class Profile:
         Получение информации о пользователе.
         Внимание. В данной функции специально не выводится СНИЛС, почта и мобильный телефон пользователя.
 
-        :param subdomain: поддомен eljur.ru
-        :param session: активная сессия пользователя
+        :param subdomain: Поддомен eljur.ru                          // str
+        :param session:   Активная сессия пользователя               // Session
 
-        :return: словарь с ошибкой или с информацией о пользователе:
-                 answer // dict
-                 session // Session
-                 subdomain // str
-                 result // bool
+        :return: Словарь с ошибкой или с информацией о пользователе: // dict
         """
 
         subdomain = _checkSubdomain(subdomain)
@@ -67,12 +63,12 @@ class Security:
         """
         Изменение пароля в личном кабинете пользователя.
 
-        :param subdomain: поддомен eljur.ru
-        :param session: активная сессия пользователя
-        :param old_password: старый пароль.
-        :param new_password: новый пароль, который пользователь желает использовать.
+        :param subdomain:    Поддомен eljur.ru                                       // str
+        :param session:      Активная сессия пользователя                            // Session
+        :param old_password: Старый пароль.                                          // str
+        :param new_password: Новый пароль, который пользователь желает использовать. // str
 
-        :return: словарь с ошибкой или bool ответ, в котором True - успешная смена пароля
+        :return: Словарь с ошибкой или bool ответ, в котором True - успешная смена пароля // dict или bool
         """
 
         subdomain = _checkSubdomain(subdomain)
@@ -115,13 +111,13 @@ class Settings:
 
     def changeSing(self, subdomain, session, text):
         """
-            Изменение подписи в новых сообщениях пользователя.
+        Изменение подписи в новых сообщениях пользователя.
 
-        :param subdomain: поддомен eljur.ru
-        :param session: активная сессия пользователя
-        :param text: Текст подписи.
+        :param subdomain: Поддомен eljur.ru                                                     // str
+        :param session:   Активная сессия пользователя                                          // Session
+        :param text:      Текст подписи                                                         // str
 
-        :return: словарь с ошибкой или bool ответ, в котором True - успешное изменение подписи.
+        :return: Словарь с ошибкой или bool ответ, в котором True - успешное изменение подписи. // dict или bool
         """
 
         subdomain = _checkSubdomain(subdomain)
@@ -156,15 +152,16 @@ class Settings:
         `Отмечать сообщение прочитанным при его открытии на электронной почте` // 0 или checkforwardedemail
         `Отображать расписание обучающегося по умолчанию (вместо расписания класса)` // 1 или schedule_default_student
 
-        :param subdomain: поддомен eljur.ru
-        :param session: активная сессия пользователя
-        :param choose: Выбор переключаемой функции // int или str
-        :param switch: bool
+        :param subdomain: Поддомен eljur.ru                                                // str
+        :param session: Активная сессия пользователя                                       // Session
+        :param choose: Выбор переключаемой функции                                         // int или str
+        :param switch: True/False                                                          // bool
 
-        :return: словарь с ошибкой или bool ответ, в котором True - успешное переключение.
+        :return: Словарь с ошибкой или bool ответ, в котором True - успешное переключение. //
         """
 
         numSwitch = [0, 1]
+        numStrSwitch = ["0", "1"]
         strSwitch = ["checkforwardedemail", "schedule_default_student"]
         switchers = {"checkforwardedemail": {"on": "on",
                                              "off": "off"},
@@ -190,8 +187,11 @@ class Settings:
                 return checkStr
             else:
                 if choose not in strSwitch:
-                    return {"error": {"error_code": -302,
-                                      "error_msg": f"Вашего выбора нет в предложенных. {choose}"}}
+                    if choose not in numStrSwitch:
+                        return {"error": {"error_code": -302,
+                                          "error_msg": f"Вашего выбора нет в предложенных. {choose}"}}
+                    else:
+                        data["0"] = strSwitch[int(choose)]
                 data["0"] = choose
         else:
             if choose not in numSwitch:

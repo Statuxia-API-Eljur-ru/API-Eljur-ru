@@ -10,9 +10,9 @@ class Authorization:
         """
         Регистрация пользователя eljur.ru.
 
-        :param code: Единоразовый код, который можно получить в школе.
+        :param code: Единоразовый код, который можно получить в школе. // str
 
-        :return: code/Не завершено
+        :return: code/Не завершено                                     // str
         """
         return code
 
@@ -20,11 +20,11 @@ class Authorization:
         """
         Подключение к пользователю eljur.ru.
 
-        :param subdomain: поддомен eljur.ru
-        :param data: дата, состоящая из {"username": "ваш логин",
-                                         "password": "ваш пароль"}
+        :param subdomain: Поддомен eljur.ru                             // str
+        :param data:      Дата, состоящая из {"username": "ваш логин",
+                                              "password": "ваш пароль"} // dict
 
-        :return: словарь с ошибкой или с положительным ответом:
+        :return: Словарь с ошибкой или с положительным ответом:         // dict
                  answer // dict
                  session // Session
                  subdomain // str
@@ -76,10 +76,10 @@ class Authorization:
         Внимание! Для использования данной функции требуется привязать почту.
         В ином случае восстановление происходит через Администратора или другого лица вашей школы.
 
-        :param subdomain: домен вашей школы.
-        :param email: ваша почта, привязанная к аккаунту eljur
+        :param subdomain: Домен вашей школы.                        // str
+        :param email:     Ваша почта, привязанная к аккаунту eljur  // str
 
-        :return: словарь с ошибкой или с положительным ответом:
+        :return: Словарь с ошибкой или с положительным ответом:     // dict
                  answer // dict
                  result // bool
         """

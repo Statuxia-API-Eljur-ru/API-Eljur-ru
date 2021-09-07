@@ -3,7 +3,6 @@ class Timetable:
     def timetable(self, subdomain, session, week):
         """
         Получение страницы расписания.
-        Внимание. В данной функции специально не выводится СНИЛС, почта и мобильный телефон пользователя.
 
         :param week:      Нужная вам неделя (even, odd, both)      // str
         :param subdomain: Поддомен eljur.ru                        // str

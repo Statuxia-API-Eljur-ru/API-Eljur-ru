@@ -39,6 +39,5 @@ Portfolio: // Не завершено
 
 ---
 TODO:
-- Доделать модуль Message
 - Доделать Portfolio и Timetable
 - Сделать example папку с примерами работы API

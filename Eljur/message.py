@@ -48,16 +48,16 @@ class Message:
         """
         Отправка сообщения по ID пользователя.
 
-        :param subdomain: Поддомен eljur.ru                                               // str
-        :param session:   Активная сессия пользователя                                    // Session
+        :param subdomain: Поддомен eljur.ru                                                      // str
+        :param session:   Активная сессия пользователя                                           // Session
 
         :param args: Словарь, состоящий из:
-                     receivers: ID пользователя. Если несколько, то через ;               // str
-                     subject:   Тема сообщение (заглавие)                                 // str
-                     message:   Сообщение                                                 // str
+                     receivers: ID пользователя. Если несколько, то через ;                      // str
+                     subject:   Тема сообщение (заглавие)                                        // str
+                     message:   Сообщение                                                        // str
 
 
-        :return: Словарь с ошибкой или bool ответ, в котором True - успешная смена пароля // dict или bool
+        :return: Словарь с ошибкой или bool ответ, в котором True - успешная отправка соообщения // dict или bool
         """
 
         subdomain = _checkSubdomain(subdomain)
@@ -101,17 +101,49 @@ class Message:
         """
         Получение сообщений пользователя.
 
-        :param subdomain: Поддомен eljur.ru                                               // str
-        :param session:   Активная сессия пользователя                                    // Session
+        :param subdomain: Поддомен eljur.ru                                                  // str
+        :param session:   Активная сессия пользователя                                       // Session
         :param args: Словарь, состоящий из:
-                     receivers: ID пользователя. Если несколько, то через ; без пробелов  // str
-                     subject:   Тема сообщение (заглавие)                                 // str
-                     message:   Сообщение                                                 // str
+                     "0": inbox/sent (полученные/отправленные)                               // str
+                     "1": Текст заглавия                                                     // str
+                     "2": Сколько сообщений показать (default: 20 / limit: 44)               // str
+                     "3": С какого сообщение начало                                          // str
+                     "4": 0 или id пользователя.                                             // str
+                     "5": read/unread/trash (Прочитанные/Непрочитанные/Корзина)              // str
+                     "6": ID пользователя, чьи сообщения мы хотим получить.                  // str
+                     "7": Дата (false, today, week, month, two_month, year)                  // str
 
-
-        :return: Словарь с ошибкой или bool ответ, в котором True - успешная смена пароля // dict или bool
+        :return: Словарь с ошибкой или с сообщениями                                         // dict
         """
-        return
+
+        pattern = {"method": "getList",
+                   "2": "20"}
+
+        subdomain = _checkSubdomain(subdomain)
+        if "error" in subdomain:
+            return subdomain
+
+        checkSession = _checkInstance(session, Session)
+        if "error" in checkSession:
+            return checkSession
+        del checkSession
+
+        checkDict = _checkInstance(args, dict)
+        if "error" in checkDict:
+            return checkDict
+        del checkDict
+
+        pattern.update(args)
+
+        url = f"https://{subdomain}.eljur.ru/journal-messages-ajax-action"
+        send = session.post(url, data=pattern)
+
+        checkStatus = _checkStatus(send, url)
+        if "error" in checkStatus:
+            return checkStatus
+        del checkStatus
+
+        return send.json()
 
     def deleteMessages(self, subdomain, session, args):
         """

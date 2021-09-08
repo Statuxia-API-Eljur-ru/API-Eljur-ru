@@ -1,5 +1,5 @@
 from Eljur.auth import Authorization
-from Eljur.profile import Security
+from Eljur.message import Message
 
 
 def run():
@@ -16,9 +16,9 @@ def run():
         print(answer)
         return
 
-    settings = Security()
-    aa = settings.changePassword(answer["subdomain"], answer["session"], data["password"], input("New Password: "))
-    print(aa)
+    message = Message()
+    answ = message.getMessages(subdomain, answer["session"], {})
+    print(answ)
 
 
 if __name__ == "__main__":

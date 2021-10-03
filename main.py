@@ -1,5 +1,4 @@
 from Eljur.auth import Authorization
-from Eljur.portfolio import Portfolio
 
 
 def run():
@@ -15,11 +14,6 @@ def run():
     if "session" not in answer:
         print(answer)
         return
-
-    portfolio = Portfolio()
-    answ = portfolio.reportCard(subdomain, answer["session"], answer["answer"]["user"]["uid"])
-    for i in answ:
-        print(i, answ[i])
 
 
 if __name__ == "__main__":

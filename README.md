@@ -38,5 +38,5 @@ Portfolio*:
 
 ---
 TODO:
-- Доделать Timetable
+- Доделать Journal
 - Сделать example папку с примерами работы API

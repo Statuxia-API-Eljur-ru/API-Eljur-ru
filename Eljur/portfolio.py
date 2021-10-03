@@ -3,6 +3,18 @@ from requests import Session
 from Eljur.errors import _checkInstance, _checkStatus, _checkSubdomain, _findData
 
 
+def _checkForID(lesson_id):
+    return lesson_id.has_attr("data-lesson_id")
+
+
+def _pattern(att):
+    dictionary = {"Всего": att.contents[3].contents[0],
+                  "По болезни": att.contents[5].contents[0],
+                  "По ув. причине": att.contents[7].contents[0],
+                  "По неув. причине": att.contents[9].contents[0]}
+    return dictionary
+
+
 class Portfolio:
 
     def reportCard(self, subdomain, session, user_id, quarter="I"):
@@ -12,12 +24,12 @@ class Portfolio:
         :param subdomain: Поддомен eljur.ru                                                     // str
         :param session:   Активная сессия пользователя                                          // Session
         :param user_id:   ID пользователя                                                       // str
-        :param quarter:   Четверть. (I, II, III, IV)                                            // str
+        :param quarter:   Четверть (I, II, III, IV)                                             // str
 
         :return: Словарь с ошибкой или ответом (отсутствие оценок или словарь с оценками)       // dict
         """
 
-        url = f"https://{subdomain}.eljur.ru/journal-student-grades-action/u.{user_id}/sp."
+        url = f"https://{subdomain}.eljur.ru/journal-student-grades-action/u.{user_id}/sp.{quarter}+четверть"
 
         subdomain = _checkSubdomain(subdomain)
         if "error" in subdomain:
@@ -62,8 +74,65 @@ class Portfolio:
 
         return card
 
-    def attendance(self, subdomain, session):
-        return
+    def attendance(self, subdomain, session, user_id, quarter="I"):
+        """
+        Изменение подписи в новых сообщениях пользователя.
+
+        :param subdomain: Поддомен eljur.ru                                                             // str
+        :param session:   Активная сессия пользователя                                                  // Session
+        :param user_id:   ID пользователя                                                               // str
+        :param quarter:   Четверть (I, II, III, IV)                                                     // str
+
+        :return: Словарь с ошибкой или ответом в виде словаря с предметами и пропущенными уроками       // dict
+        """
+        url = f"https://{subdomain}.eljur.ru/journal-app/view.miss_report/u.{user_id}/sp.{quarter}+четверть"
+
+        subdomain = _checkSubdomain(subdomain)
+        if "error" in subdomain:
+            return subdomain
+
+        checkSession = _checkInstance(session, Session)
+        if "error" in checkSession:
+            return checkSession
+        del checkSession
+
+        journal = session.get(url=url)
+
+        checkStatus = _checkStatus(journal, url)
+        if "error" in checkStatus:
+            return checkStatus
+        del checkStatus
+
+        soup = BeautifulSoup(journal.text, 'lxml')
+        del journal, url
+
+        sentryData = _findData(soup)
+        if not sentryData:
+            return {"error": {"error_code": -401,
+                              "error_msg": "Данные о пользователе не найдены."}}
+        del sentryData
+
+        answer = soup.find("div", class_="page-empty")
+
+        if answer:
+            return {"answer": answer.contents[0],
+                    "result": False}
+
+        card = {}
+        subjects = soup.find_all(_checkForID)
+
+        for subject in subjects:
+            lessonInfo = _pattern(subject)
+            if not subject.contents[1].contents:
+                subject.contents[1].contents = ["Всего"]
+            card.update([(subject.contents[1].contents[0], lessonInfo)])
+
+        days = soup.find_all("tr", attrs={"xls": "hrow"})
+        daysInfo = _pattern(days[1])
+
+        card.update([(days[1].contents[1].contents[0], daysInfo)])
+
+        return card
 
     def finalGrades(self, subdomain, session, user_id, data=None):
         """

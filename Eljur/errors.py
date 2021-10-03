@@ -1,4 +1,6 @@
 import re
+from bs4 import BeautifulSoup
+from requests import Session
 
 
 def _findData(soup):
@@ -37,3 +39,48 @@ def _checkInstance(obj, cls):
     else:
         return {"answer": "Ok",
                 "result": True}
+
+
+def _fullCheck(subdomain, session, url, data=None):
+    subdomain = _checkSubdomain(subdomain)
+    if "error" in subdomain:
+        return subdomain
+
+    checkSession = _checkInstance(session, Session)
+    if "error" in checkSession:
+        return checkSession
+    del checkSession
+
+    getInfo = session.post(url=url, data=data)
+
+    checkStatus = _checkStatus(getInfo, url)
+    if "error" in checkStatus:
+        return checkStatus
+    del checkStatus
+
+    soup = BeautifulSoup(getInfo.text, 'lxml')
+    del getInfo, url
+
+    sentryData = _findData(soup)
+    if not sentryData:
+        return {"error": {"error_code": -104,
+                          "error_msg": "Данные о пользователе не найдены."}}
+    del sentryData
+
+    return soup
+
+
+def _smallCheck(subdomain, session, args):
+    subdomain = _checkSubdomain(subdomain)
+    if "error" in subdomain:
+        return subdomain
+
+    checkSession = _checkInstance(session, Session)
+    if "error" in checkSession:
+        return checkSession
+    del checkSession
+
+    checkDict = _checkInstance(args, dict)
+    if "error" in checkDict:
+        return checkDict
+    del checkDict

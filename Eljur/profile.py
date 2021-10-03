@@ -1,6 +1,5 @@
-from bs4 import BeautifulSoup
 from requests import Session
-from Eljur.errors import _checkInstance, _checkStatus, _checkSubdomain, _findData
+from Eljur.errors import _checkInstance, _checkStatus, _checkSubdomain, _fullCheck
 
 
 class Profile:
@@ -16,30 +15,11 @@ class Profile:
         :return: Словарь с ошибкой или с информацией о пользователе: // dict
         """
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
         url = f"https://{subdomain}.eljur.ru/journal-user-preferences-action"
-        account = session.get(url=url)
 
-        checkStatus = _checkStatus(account, url)
-        if "error" in checkStatus:
-            return checkStatus
-        del checkStatus
-
-        soup = BeautifulSoup(account.text, 'lxml')
-
-        sentryData = _findData(soup)
-        if not sentryData:
-            return {"error": {"error_code": -104,
-                              "error_msg": "Данные о пользователе не найдены."}}
-        del sentryData
+        soup = _fullCheck(subdomain, session, url)
+        if "error" in soup:
+            return soup
 
         label = None
         info = {}

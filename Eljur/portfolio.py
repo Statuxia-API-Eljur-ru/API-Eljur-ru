@@ -1,6 +1,4 @@
-from bs4 import BeautifulSoup
-from requests import Session
-from Eljur.errors import _checkInstance, _checkStatus, _checkSubdomain, _findData
+from Eljur.errors import _fullCheck
 
 
 def _checkForID(lesson_id):
@@ -31,30 +29,9 @@ class Portfolio:
 
         url = f"https://{subdomain}.eljur.ru/journal-student-grades-action/u.{user_id}/sp.{quarter}+четверть"
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
-        journal = session.get(url=url + quarter)
-
-        checkStatus = _checkStatus(journal, url)
-        if "error" in checkStatus:
-            return checkStatus
-        del checkStatus
-
-        soup = BeautifulSoup(journal.text, 'lxml')
-        del journal, url
-
-        sentryData = _findData(soup)
-        if not sentryData:
-            return {"error": {"error_code": -401,
-                              "error_msg": "Данные о пользователе не найдены."}}
-        del sentryData
+        soup = _fullCheck(subdomain, session, url)
+        if "error" in soup:
+            return soup
 
         answer = soup.find("div", class_="page-empty")
 
@@ -66,9 +43,11 @@ class Portfolio:
         subjects = soup.find_all("div", class_="text-overflow lhCell offset16")
 
         for subject in subjects:
-            scores = {}
-            for score in soup.find_all("div", class_="cell blue", attrs={"name": subject.contents[0]}):
-                scores.update([(score.attrs["mark_date"], score.contents[1].contents[0])])
+            scores = []
+            for score in soup.find_all("div", class_=["cell blue", "cell"], attrs={"name": subject.contents[0]}):
+                if "mark_date" in score.attrs:
+                    if score.attrs["id"] != "N":
+                        scores.append({score.attrs["mark_date"], score.contents[1].contents[0]})
             card.update([(subject.contents[0], scores)])
         card.update(result=True)
 
@@ -87,30 +66,9 @@ class Portfolio:
         """
         url = f"https://{subdomain}.eljur.ru/journal-app/view.miss_report/u.{user_id}/sp.{quarter}+четверть"
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
-        journal = session.get(url=url)
-
-        checkStatus = _checkStatus(journal, url)
-        if "error" in checkStatus:
-            return checkStatus
-        del checkStatus
-
-        soup = BeautifulSoup(journal.text, 'lxml')
-        del journal, url
-
-        sentryData = _findData(soup)
-        if not sentryData:
-            return {"error": {"error_code": -401,
-                              "error_msg": "Данные о пользователе не найдены."}}
-        del sentryData
+        soup = _fullCheck(subdomain, session, url)
+        if "error" in soup:
+            return soup
 
         answer = soup.find("div", class_="page-empty")
 
@@ -147,30 +105,9 @@ class Portfolio:
         """
         url = f"https://{subdomain}.eljur.ru/journal-student-resultmarks-action/u.{user_id}"
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
-        journal = session.post(url=url, data=data)
-
-        checkStatus = _checkStatus(journal, url)
-        if "error" in checkStatus:
-            return checkStatus
-        del checkStatus
-
-        soup = BeautifulSoup(journal.text, 'lxml')
-        del journal, url
-
-        sentryData = _findData(soup)
-        if not sentryData:
-            return {"error": {"error_code": -401,
-                              "error_msg": "Данные о пользователе не найдены."}}
-        del sentryData
+        soup = _fullCheck(subdomain, session, url, data)
+        if "error" in soup:
+            return soup
 
         answer = soup.find("div", class_="page-empty")
 

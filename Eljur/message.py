@@ -1,5 +1,4 @@
-from requests import Session
-from Eljur.errors import _checkStatus, _checkSubdomain, _checkInstance
+from Eljur.errors import _checkStatus, _checkSubdomain, _smallCheck
 
 
 class Message:
@@ -60,19 +59,10 @@ class Message:
         :return: Словарь с ошибкой или bool ответ, в котором True - успешная отправка соообщения // dict или bool
         """
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
-        checkDict = _checkInstance(args, dict)
-        if "error" in checkDict:
-            return checkDict
-        del checkDict
+        check = _smallCheck(subdomain, session, args)
+        if "error" in check:
+            return check
+        del check
 
         url = f"https://{subdomain}.eljur.ru/journal-messages-compose-action"
         get_cookies = session.get(url, data={"_msg": "sent"})
@@ -119,19 +109,10 @@ class Message:
         pattern = {"method": "getList",
                    "2": "20"}
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
-        checkDict = _checkInstance(args, dict)
-        if "error" in checkDict:
-            return checkDict
-        del checkDict
+        check = _smallCheck(subdomain, session, args)
+        if "error" in check:
+            return check
+        del check
 
         pattern.update(args)
 
@@ -163,19 +144,10 @@ class Message:
                  error  // str
         """
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
-        checkDict = _checkInstance(args, dict)
-        if "error" in checkDict:
-            return checkDict
-        del checkDict
+        check = _smallCheck(subdomain, session, args)
+        if "error" in check:
+            return check
+        del check
 
         pattern = {"method": "delete"}
         pattern.update(args)
@@ -204,19 +176,10 @@ class Message:
                  error  // str
         """
 
-        subdomain = _checkSubdomain(subdomain)
-        if "error" in subdomain:
-            return subdomain
-
-        checkSession = _checkInstance(session, Session)
-        if "error" in checkSession:
-            return checkSession
-        del checkSession
-
-        checkDict = _checkInstance(args, dict)
-        if "error" in checkDict:
-            return checkDict
-        del checkDict
+        check = _smallCheck(subdomain, session, args)
+        if "error" in check:
+            return check
+        del check
 
         pattern = {"method": "restore",
                    "1": "inbox"}

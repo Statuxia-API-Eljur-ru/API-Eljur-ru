@@ -8,10 +8,10 @@ class Message:
         """
         Получение тех, кому можем отправить сообщение.
 
-        :param subdomain: Поддомен eljur.ru                                     // str
-        :param session:   Активная сессия пользователя                          // Session
+        :param subdomain: Поддомен eljur.ru                                                // str
+        :param session:   Активная сессия пользователя                                     // Session
 
-        :return: Возвращает массив из словарей возможных получателей сообщения. // list
+        :return: Возвращает ошибку или массив из словарей возможных получателей сообщения. // list
         """
 
         pattern = {"0": "school",

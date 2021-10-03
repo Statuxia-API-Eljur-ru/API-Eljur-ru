@@ -157,7 +157,7 @@ class Settings:
         :param choose: Выбор переключаемой функции                                         // int или str
         :param switch: True/False                                                          // bool
 
-        :return: Словарь с ошибкой или bool ответ, в котором True - успешное переключение. //
+        :return: Словарь с ошибкой или bool ответ, в котором True - успешное переключение. // dict или bool
         """
 
         numSwitch = [0, 1]

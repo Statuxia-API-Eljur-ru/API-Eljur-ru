@@ -38,4 +38,4 @@ Portfolio:
 
 ---
 TODO:
-- Сделать example папку с примерами работы API
+-

@@ -1,5 +1,5 @@
 from Eljur.auth import Authorization
-from Eljur.message import Message
+from Eljur.portfolio import Portfolio
 
 
 def run():
@@ -16,9 +16,10 @@ def run():
         print(answer)
         return
 
-    message = Message()
-    answ = message.getMessages(subdomain, answer["session"], {})
-    print(answ)
+    portfolio = Portfolio()
+    answ = portfolio.reportCard(subdomain, answer["session"], answer["answer"]["user"]["uid"])
+    for i in answ:
+        print(i, answ[i])
 
 
 if __name__ == "__main__":

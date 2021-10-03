@@ -60,7 +60,7 @@ class Message:
         """
 
         check = _smallCheck(subdomain, session, args)
-        if "error" in check:
+        if not check:
             return check
         del check
 
@@ -110,7 +110,7 @@ class Message:
                    "2": "20"}
 
         check = _smallCheck(subdomain, session, args)
-        if "error" in check:
+        if check:
             return check
         del check
 
@@ -145,7 +145,7 @@ class Message:
         """
 
         check = _smallCheck(subdomain, session, args)
-        if "error" in check:
+        if not check:
             return check
         del check
 
@@ -177,7 +177,7 @@ class Message:
         """
 
         check = _smallCheck(subdomain, session, args)
-        if "error" in check:
+        if not check:
             return check
         del check
 

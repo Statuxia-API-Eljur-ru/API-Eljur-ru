@@ -177,7 +177,7 @@ class Message:
         """
 
         check = _smallCheck(subdomain, session, args)
-        if not check:
+        if check:
             return check
         del check
 
